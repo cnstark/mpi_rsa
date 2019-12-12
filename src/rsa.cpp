@@ -63,13 +63,17 @@ bool RSAKeyGen::is_prime(long n) {
 }
 
 /**
- * 生成公钥(e为随机值)
+ * 生成公钥(e默认为随机值)
+ * 当fix为true时，e从pos位置开始寻找满足条件的值
  */
-RSAPubKey RSAKeyGen::generate_pub_key() {
+RSAPubKey RSAKeyGen::generate_pub_key(bool fix, long pos) {
     e = m - 1;
-    srand(time(nullptr));
-    // e从一个小于m/2的随机数开始递增，直到满足与m互质
-    for (long i = rand() % (long) (m / 2); i < m - 1; i++) {
+    if (!fix) {
+        // e从一个小于m/2的随机数开始递增，直到满足与m互质
+        srand(time(nullptr));
+        pos = rand() % (long) (m / 2);
+    }
+    for (long i = pos; i < m - 1; i++) {
         if (gcd(m, i) == 1) {
             e = i;
             break;
@@ -92,9 +96,10 @@ RSAPriKey RSAKeyGen::generate_pri_key() {
 
 /**
  * 生成一对密钥
+ * 当fix为true时，e从pos位置开始寻找满足条件的值
  */
-RSAKey RSAKeyGen::generate_key() {
-    RSAPubKey pub = generate_pub_key();
+RSAKey RSAKeyGen::generate_key(bool fix, long pos) {
+    RSAPubKey pub = generate_pub_key(fix, pos);
     RSAPriKey pri = generate_pri_key();
     return {pub, pri};
 }
@@ -136,13 +141,13 @@ string decrypt(RSAPriKey key, const vector<long> &code) {
     return string(c_arr);
 }
 
-void encrypt(RSAPubKey key, char *value, long *code, long len) {
+void encrypt(RSAPubKey key, const char *value, long *code, long len) {
     for (int i = 0; i < len; i++) {
         code[i] = encrypt(key, value[i]);
     }
 }
 
-void decrypt(RSAPriKey key, long *code, char *value, long len) {
+void decrypt(RSAPriKey key, const long *code, char *value, long len) {
     for (int i = 0; i < len; i++) {
         value[i] = (char) decrypt(key, code[i]);
     }

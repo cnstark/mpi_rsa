@@ -113,9 +113,10 @@ private:
     static bool is_prime(long n);
 
     /**
-     * 生成公钥(e为随机值)
+     * 生成公钥(e默认为随机值)
+     * 当fix为true时，e从pos位置开始寻找满足条件的值
      */
-    RSAPubKey generate_pub_key();
+    RSAPubKey generate_pub_key(bool fix = false, long pos = 0);
 
     /**
      * 生成私钥
@@ -127,8 +128,9 @@ public:
 
     /**
      * 生成一对密钥
+     * 当fix为true时，e从pos位置开始寻找满足条件的值
      */
-    RSAKey generate_key();
+    RSAKey generate_key(bool fix = false, long pos = 0);
 };
 
 /**
@@ -159,11 +161,11 @@ string decrypt(RSAPriKey key, const vector<long> &code);
 /**
  * 加密字符串（char数组，结果保存于long数组）
  */
-void encrypt(RSAPubKey key, char *value, long *code, long len);
+void encrypt(RSAPubKey key, const char *value, long *code, long len);
 
 /**
  * 解密字符串（从long数组，结果保存于char数组）
  */
-void decrypt(RSAPriKey key, long *code, char *value, long len);
+void decrypt(RSAPriKey key, const long *code, char *value, long len);
 
 #endif //PARALEL_RSA_MPI_MASTER_RSA_HPP
